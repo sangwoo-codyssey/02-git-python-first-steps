@@ -56,8 +56,9 @@ class QuizGame:
         print("  1. 퀴즈 풀기")
         print("  2. 퀴즈 추가")
         print("  3. 퀴즈 목록")
-        print("  4. 점수 확인")
-        print("  5. 종료")
+        print("  4. 퀴즈 삭제")
+        print("  5. 점수 확인")
+        print("  6. 종료")
         print("=" * 36)
 
     def run(self):
@@ -76,8 +77,10 @@ class QuizGame:
                 elif choice == 3:
                     self.list_quizzes()
                 elif choice == 4:
-                    self.show_score()
+                    self.delete_quiz()
                 elif choice == 5:
+                    self.show_score()
+                elif choice == 6:
                     self.save()
                     print("\n게임을 종료합니다. 안녕히 가세요!")
                     break
@@ -167,6 +170,45 @@ class QuizGame:
                 marker = "→" if j == quiz.answer else " "
                 print(f"      {marker} {j}. {choice}")
 
+    def delete_quiz(self):
+        """등록된 퀴즈를 삭제한다."""
+        if not self.quizzes:
+            print("\n등록된 퀴즈가 없습니다.")
+            return
+
+        print(f"\n--- 퀴즈 삭제 (총 {len(self.quizzes)}개) ---")
+        for i, quiz in enumerate(self.quizzes, 1):
+            print(f"  [{i}] {quiz.question}")
+
+        while True:
+            try:
+                raw = input(f"\n삭제할 번호 (1~{len(self.quizzes)}, 0=취소): ").strip()
+            except (KeyboardInterrupt, EOFError):
+                return
+
+            if not raw:
+                print("입력이 비어 있습니다.")
+                continue
+
+            try:
+                num = int(raw)
+            except ValueError:
+                print("숫자를 입력해 주세요.")
+                continue
+
+            if num == 0:
+                print("삭제를 취소합니다.")
+                return
+
+            if num < 1 or num > len(self.quizzes):
+                print(f"1~{len(self.quizzes)} 또는 0(취소)을 입력해 주세요.")
+                continue
+
+            removed = self.quizzes.pop(num - 1)
+            self.save()
+            print(f"\n삭제 완료: {removed.question}")
+            return
+
     def show_score(self):
         """최고 점수를 출력한다."""
         if self.best_score is None:
@@ -217,12 +259,12 @@ class QuizGame:
     def _read_menu_choice(self):
         """메뉴 번호를 입력받아 반환한다."""
         try:
-            raw = input("선택 (1~5): ").strip()
+            raw = input("선택 (1~6):").strip()
         except (KeyboardInterrupt, EOFError):
             raise
 
         if not raw:
-            print("입력이 비어 있습니다. 1~5 중 선택해 주세요.")
+            print("입력이 비어 있습니다. 1~6 중 선택해 주세요.")
             return None
 
         try:
@@ -231,8 +273,8 @@ class QuizGame:
             print("숫자를 입력해 주세요.")
             return None
 
-        if num < 1 or num > 5:
-            print("1~5 중 선택해 주세요.")
+        if num < 1 or num > 6:
+            print("1~6 중 선택해 주세요.")
             return None
 
         return num
