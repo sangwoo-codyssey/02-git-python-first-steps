@@ -158,7 +158,11 @@ class QuizGame:
                 print(f"      {marker} {j}. {choice}")
 
     def show_score(self):
-        print("\n[미구현] 점수 확인 기능은 아직 준비 중입니다.")
+        """최고 점수를 출력한다."""
+        if self.best_score is None:
+            print("\n아직 퀴즈를 푼 기록이 없습니다.")
+        else:
+            print(f"\n★ 최고 점수: {self.best_score}/{len(self.quizzes)}")
 
     # ── 파일 저장/불러오기 ──
 
