@@ -1,5 +1,6 @@
 import json
 import os
+import random
 
 from quiz import Quiz
 
@@ -92,12 +93,15 @@ class QuizGame:
             print("\n등록된 퀴즈가 없습니다. 먼저 퀴즈를 추가해 주세요.")
             return
 
-        total = len(self.quizzes)
+        quizzes = list(self.quizzes)
+        random.shuffle(quizzes)
+
+        total = len(quizzes)
         correct = 0
 
         print(f"\n총 {total}문제를 풀겠습니다. 행운을 빕니다!\n")
 
-        for i, quiz in enumerate(self.quizzes, 1):
+        for i, quiz in enumerate(quizzes, 1):
             quiz.display(number=i)
             answer = self._read_answer()
             if answer is None:
