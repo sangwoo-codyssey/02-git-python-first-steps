@@ -117,3 +117,37 @@ python3 main.py
 
 - 파일이 없으면 기본 퀴즈 5개로 자동 생성됩니다.
 - 파일이 손상된 경우 안내 메시지 출력 후 기본 데이터로 복구됩니다.
+
+## 스크린샷
+
+### 환경
+![환경](screenshots/evn.png)
+
+### 메뉴
+![메뉴](screenshots/menu.png)
+
+### 퀴즈 풀기
+![퀴즈 풀기](screenshots/play.png)
+
+### 퀴즈 추가
+![퀴즈 추가](screenshots/add_quiz.png)
+
+### 퀴즈 목록
+![퀴즈 목록](screenshots/list_quiz.png)
+
+### 퀴즈 삭제
+![퀴즈 삭제](screenshots/delete_quiz.png)
+
+### 퀴즈 삭제 결과
+![퀴즈 삭제 결과](screenshots/delete_quiz_result.png)
+
+### 점수 확인
+![점수 확인](screenshots/check_score.png)
+
+### 데이터 유지
+![데이터 유지](screenshots/data_persist.png)
+
+### 잘못된 입력 처리
+![잘못된 입력 처리](screenshots/invalid_input.png)
+
+
