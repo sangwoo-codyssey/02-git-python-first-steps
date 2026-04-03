@@ -6,7 +6,7 @@ CONTAINER_NAME="quiz-game"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 # 바인드 마운트 경로: 환경변수 > 두 번째 인자 > 기본값(~/App)
-APP_DIR="${APP_DIR:-${2:-$HOME/App}}"
+APP_DIR="${APP_DIR:-${2:-$PWD}}"
 APP_DIR="$(eval echo "$APP_DIR")"
 
 # APP_DIR이 없으면 생성
@@ -52,10 +52,10 @@ case "${1:-shell}" in
     echo "바인드 마운트 경로 우선순위:"
     echo "  1. 환경변수 APP_DIR"
     echo "  2. 두 번째 인자"
-    echo "  3. 기본값: ~/App"
+    echo "  3. 기본값: 현재 디렉터리"
     echo ""
     echo "예시:"
-    echo "  $0 shell                    # ~/App 마운트"
+    echo "  $0 shell                    # 현재 디렉터리 마운트"
     echo "  $0 shell /path/to/project   # 지정 경로 마운트"
     echo "  APP_DIR=/tmp/dev $0 shell   # 환경변수로 지정"
     exit 1
