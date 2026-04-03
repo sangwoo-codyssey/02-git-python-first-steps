@@ -150,4 +150,9 @@ python3 main.py
 ### 잘못된 입력 처리
 ![잘못된 입력 처리](screenshots/invalid_input.png)
 
+### Git 로그
+![Git 로그](screenshots/git.png)
 
+## Git 저장소
+
+- https://github.com/sangwoo-codyssey/02-git-python-first-steps
