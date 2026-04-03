@@ -24,6 +24,7 @@ case "${1:-shell}" in
       docker build -t "$IMAGE_NAME" "$SCRIPT_DIR"
     fi
     echo "=== 개발 컨테이너 실행 (바인드 마운트: $APP_DIR -> /app) ==="
+    docker rm -f "$CONTAINER_NAME" 2>/dev/null || true
     docker run -it --rm \
       --name "$CONTAINER_NAME" \
       -v "$APP_DIR:/app" \
@@ -35,6 +36,7 @@ case "${1:-shell}" in
       docker build -t "$IMAGE_NAME" "$SCRIPT_DIR"
     fi
     echo "=== 퀴즈 게임 실행 (바인드 마운트: $APP_DIR -> /app) ==="
+    docker rm -f "$CONTAINER_NAME" 2>/dev/null || true
     docker run -it --rm \
       --name "$CONTAINER_NAME" \
       -v "$APP_DIR:/app" \
