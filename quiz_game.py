@@ -1,6 +1,7 @@
 import json
 import os
 import random
+from datetime import datetime
 
 from quiz import Quiz
 
@@ -46,6 +47,7 @@ class QuizGame:
     def __init__(self):
         self.quizzes = []
         self.best_score = None
+        self.history = []
         self.load()
 
     # ── 메뉴 ──
@@ -128,10 +130,17 @@ class QuizGame:
         print(f"  점수: {correct}/{total}")
         print(f"{'=' * 30}")
 
+        self.history.append({
+            "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "total": total,
+            "correct": correct,
+        })
+
         if self.best_score is None or correct > self.best_score:
             self.best_score = correct
             print("  ★ 새로운 최고 점수입니다!")
-            self.save()
+
+        self.save()
 
     def add_quiz(self):
         """새로운 퀴즈를 입력받아 등록한다."""
@@ -210,11 +219,17 @@ class QuizGame:
             return
 
     def show_score(self):
-        """최고 점수를 출력한다."""
+        """최고 점수와 게임 히스토리를 출력한다."""
         if self.best_score is None:
             print("\n아직 퀴즈를 푼 기록이 없습니다.")
-        else:
-            print(f"\n★ 최고 점수: {self.best_score}/{len(self.quizzes)}")
+            return
+
+        print(f"\n★ 최고 점수: {self.best_score}/{len(self.quizzes)}")
+
+        if self.history:
+            print(f"\n--- 게임 기록 (최근 10건) ---")
+            for record in self.history[-10:]:
+                print(f"  {record['date']}  |  {record['correct']}/{record['total']}")
 
     # ── 파일 저장/불러오기 ──
 
@@ -223,6 +238,7 @@ class QuizGame:
         data = {
             "quizzes": [q.to_dict() for q in self.quizzes],
             "best_score": self.best_score,
+            "history": self.history,
         }
         try:
             with open(STATE_FILE, "w", encoding="utf-8") as f:
@@ -241,6 +257,7 @@ class QuizGame:
                 data = json.load(f)
             self.quizzes = [Quiz.from_dict(q) for q in data.get("quizzes", [])]
             self.best_score = data.get("best_score")
+            self.history = data.get("history", [])
         except (json.JSONDecodeError, KeyError, TypeError) as e:
             print(f"\n[경고] 데이터 파일이 손상되었습니다: {e}")
             print("기본 퀴즈 데이터로 초기화합니다.\n")
@@ -253,6 +270,7 @@ class QuizGame:
         """기본 퀴즈 데이터를 로드한다."""
         self.quizzes = [Quiz.from_dict(q) for q in DEFAULT_QUIZZES]
         self.best_score = None
+        self.history = []
 
     # ── 입력 헬퍼 ──
 
