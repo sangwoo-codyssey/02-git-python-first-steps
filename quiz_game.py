@@ -113,18 +113,23 @@ class QuizGame:
 
         print(f"\n총 {total}문제를 풀겠습니다. 행운을 빕니다!\n")
 
+        answered = 0
         for i, quiz in enumerate(quizzes, 1):
             quiz.display(number=i)
             answer = self._read_answer()
             if answer is None:
                 print("퀴즈 풀기를 중단합니다.")
-                return
+                break
 
+            answered += 1
             if quiz.check_answer(answer):
                 print("  ✓ 정답입니다!")
                 correct += 1
             else:
                 print(f"  ✗ 오답입니다. 정답은 {quiz.answer}번입니다.")
+
+        if answered == 0:
+            return
 
         print(f"\n{'=' * 30}")
         print(f"  결과: {total}문제 중 {correct}문제 정답")
@@ -137,10 +142,16 @@ class QuizGame:
             "correct": correct,
         })
 
-        if self.best_score is None or correct > self.best_score:
+        rate = round(correct / total * 100, 1)
+        if self.best_score is not None:
+            best_rate = round(self.best_score / self.best_total * 100, 1)
+            is_new_best = rate > best_rate or (rate == best_rate and total > self.best_total)
+        else:
+            is_new_best = True
+        if is_new_best:
             self.best_score = correct
             self.best_total = total
-            print("  ★ 새로운 최고 점수입니다!")
+            print(f"  ★ 새로운 최고 점수입니다! ({rate}%)")
 
         self.save()
 
@@ -227,7 +238,8 @@ class QuizGame:
             return
 
         if self.best_total is not None:
-            print(f"\n★ 최고 점수: {self.best_score}/{self.best_total}")
+            rate = round(self.best_score / self.best_total * 100, 1)
+            print(f"\n★ 최고 점수: {rate}% ({self.best_score}/{self.best_total})")
         else:
             print(f"\n★ 최고 점수: {self.best_score}")
 
