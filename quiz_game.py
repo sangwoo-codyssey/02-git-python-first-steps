@@ -1,5 +1,7 @@
 import json
 import os
+import random
+from datetime import datetime
 
 from quiz import Quiz
 
@@ -45,6 +47,7 @@ class QuizGame:
     def __init__(self):
         self.quizzes = []
         self.best_score = None
+        self.history = []
         self.load()
 
     # ── 메뉴 ──
@@ -55,8 +58,9 @@ class QuizGame:
         print("  1. 퀴즈 풀기")
         print("  2. 퀴즈 추가")
         print("  3. 퀴즈 목록")
-        print("  4. 점수 확인")
-        print("  5. 종료")
+        print("  4. 퀴즈 삭제")
+        print("  5. 점수 확인")
+        print("  6. 종료")
         print("=" * 36)
 
     def run(self):
@@ -75,8 +79,10 @@ class QuizGame:
                 elif choice == 3:
                     self.list_quizzes()
                 elif choice == 4:
-                    self.show_score()
+                    self.delete_quiz()
                 elif choice == 5:
+                    self.show_score()
+                elif choice == 6:
                     self.save()
                     print("\n게임을 종료합니다. 안녕히 가세요!")
                     break
@@ -92,12 +98,21 @@ class QuizGame:
             print("\n등록된 퀴즈가 없습니다. 먼저 퀴즈를 추가해 주세요.")
             return
 
-        total = len(self.quizzes)
+        max_count = len(self.quizzes)
+        count = self._read_quiz_count(max_count)
+        if count is None:
+            return
+
+        quizzes = list(self.quizzes)
+        random.shuffle(quizzes)
+        quizzes = quizzes[:count]
+
+        total = len(quizzes)
         correct = 0
 
         print(f"\n총 {total}문제를 풀겠습니다. 행운을 빕니다!\n")
 
-        for i, quiz in enumerate(self.quizzes, 1):
+        for i, quiz in enumerate(quizzes, 1):
             quiz.display(number=i)
             answer = self._read_answer()
             if answer is None:
@@ -115,10 +130,17 @@ class QuizGame:
         print(f"  점수: {correct}/{total}")
         print(f"{'=' * 30}")
 
+        self.history.append({
+            "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "total": total,
+            "correct": correct,
+        })
+
         if self.best_score is None or correct > self.best_score:
             self.best_score = correct
             print("  ★ 새로운 최고 점수입니다!")
-            self.save()
+
+        self.save()
 
     def add_quiz(self):
         """새로운 퀴즈를 입력받아 등록한다."""
@@ -157,12 +179,57 @@ class QuizGame:
                 marker = "→" if j == quiz.answer else " "
                 print(f"      {marker} {j}. {choice}")
 
+    def delete_quiz(self):
+        """등록된 퀴즈를 삭제한다."""
+        if not self.quizzes:
+            print("\n등록된 퀴즈가 없습니다.")
+            return
+
+        print(f"\n--- 퀴즈 삭제 (총 {len(self.quizzes)}개) ---")
+        for i, quiz in enumerate(self.quizzes, 1):
+            print(f"  [{i}] {quiz.question}")
+
+        while True:
+            try:
+                raw = input(f"\n삭제할 번호 (1~{len(self.quizzes)}, 0=취소): ").strip()
+            except (KeyboardInterrupt, EOFError):
+                return
+
+            if not raw:
+                print("입력이 비어 있습니다.")
+                continue
+
+            try:
+                num = int(raw)
+            except ValueError:
+                print("숫자를 입력해 주세요.")
+                continue
+
+            if num == 0:
+                print("삭제를 취소합니다.")
+                return
+
+            if num < 1 or num > len(self.quizzes):
+                print(f"1~{len(self.quizzes)} 또는 0(취소)을 입력해 주세요.")
+                continue
+
+            removed = self.quizzes.pop(num - 1)
+            self.save()
+            print(f"\n삭제 완료: {removed.question}")
+            return
+
     def show_score(self):
-        """최고 점수를 출력한다."""
+        """최고 점수와 게임 히스토리를 출력한다."""
         if self.best_score is None:
             print("\n아직 퀴즈를 푼 기록이 없습니다.")
-        else:
-            print(f"\n★ 최고 점수: {self.best_score}/{len(self.quizzes)}")
+            return
+
+        print(f"\n★ 최고 점수: {self.best_score}/{len(self.quizzes)}")
+
+        if self.history:
+            print(f"\n--- 게임 기록 (최근 10건) ---")
+            for record in self.history[-10:]:
+                print(f"  {record['date']}  |  {record['correct']}/{record['total']}")
 
     # ── 파일 저장/불러오기 ──
 
@@ -171,6 +238,7 @@ class QuizGame:
         data = {
             "quizzes": [q.to_dict() for q in self.quizzes],
             "best_score": self.best_score,
+            "history": self.history,
         }
         try:
             with open(STATE_FILE, "w", encoding="utf-8") as f:
@@ -189,6 +257,7 @@ class QuizGame:
                 data = json.load(f)
             self.quizzes = [Quiz.from_dict(q) for q in data.get("quizzes", [])]
             self.best_score = data.get("best_score")
+            self.history = data.get("history", [])
         except (json.JSONDecodeError, KeyError, TypeError) as e:
             print(f"\n[경고] 데이터 파일이 손상되었습니다: {e}")
             print("기본 퀴즈 데이터로 초기화합니다.\n")
@@ -201,18 +270,19 @@ class QuizGame:
         """기본 퀴즈 데이터를 로드한다."""
         self.quizzes = [Quiz.from_dict(q) for q in DEFAULT_QUIZZES]
         self.best_score = None
+        self.history = []
 
     # ── 입력 헬퍼 ──
 
     def _read_menu_choice(self):
         """메뉴 번호를 입력받아 반환한다."""
         try:
-            raw = input("선택 (1~5): ").strip()
+            raw = input("선택 (1~6):").strip()
         except (KeyboardInterrupt, EOFError):
             raise
 
         if not raw:
-            print("입력이 비어 있습니다. 1~5 중 선택해 주세요.")
+            print("입력이 비어 있습니다. 1~6 중 선택해 주세요.")
             return None
 
         try:
@@ -221,8 +291,8 @@ class QuizGame:
             print("숫자를 입력해 주세요.")
             return None
 
-        if num < 1 or num > 5:
-            print("1~5 중 선택해 주세요.")
+        if num < 1 or num > 6:
+            print("1~6 중 선택해 주세요.")
             return None
 
         return num
@@ -271,6 +341,35 @@ class QuizGame:
 
             if num < 1 or num > 4:
                 print("1~4 중 선택해 주세요.")
+                continue
+
+            return num
+
+    def _read_quiz_count(self, max_count):
+        """풀 문제 수를 입력받아 반환한다. 0이면 랜덤."""
+        while True:
+            try:
+                raw = input(f"풀 문제 수 (1~{max_count}, 0=랜덤): ").strip()
+            except (KeyboardInterrupt, EOFError):
+                return None
+
+            if not raw:
+                print("입력이 비어 있습니다.")
+                continue
+
+            try:
+                num = int(raw)
+            except ValueError:
+                print("숫자를 입력해 주세요.")
+                continue
+
+            if num == 0:
+                count = random.randint(1, max_count)
+                print(f"  → 랜덤으로 {count}문제가 선택되었습니다.")
+                return count
+
+            if num < 1 or num > max_count:
+                print(f"1~{max_count} 또는 0(랜덤)을 입력해 주세요.")
                 continue
 
             return num
