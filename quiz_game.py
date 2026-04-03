@@ -93,8 +93,14 @@ class QuizGame:
             print("\n등록된 퀴즈가 없습니다. 먼저 퀴즈를 추가해 주세요.")
             return
 
+        max_count = len(self.quizzes)
+        count = self._read_quiz_count(max_count)
+        if count is None:
+            return
+
         quizzes = list(self.quizzes)
         random.shuffle(quizzes)
+        quizzes = quizzes[:count]
 
         total = len(quizzes)
         correct = 0
@@ -275,6 +281,35 @@ class QuizGame:
 
             if num < 1 or num > 4:
                 print("1~4 중 선택해 주세요.")
+                continue
+
+            return num
+
+    def _read_quiz_count(self, max_count):
+        """풀 문제 수를 입력받아 반환한다. 0이면 랜덤."""
+        while True:
+            try:
+                raw = input(f"풀 문제 수 (1~{max_count}, 0=랜덤): ").strip()
+            except (KeyboardInterrupt, EOFError):
+                return None
+
+            if not raw:
+                print("입력이 비어 있습니다.")
+                continue
+
+            try:
+                num = int(raw)
+            except ValueError:
+                print("숫자를 입력해 주세요.")
+                continue
+
+            if num == 0:
+                count = random.randint(1, max_count)
+                print(f"  → 랜덤으로 {count}문제가 선택되었습니다.")
+                return count
+
+            if num < 1 or num > max_count:
+                print(f"1~{max_count} 또는 0(랜덤)을 입력해 주세요.")
                 continue
 
             return num
