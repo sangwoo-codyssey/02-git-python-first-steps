@@ -121,7 +121,28 @@ class QuizGame:
             self.save()
 
     def add_quiz(self):
-        print("\n[미구현] 퀴즈 추가 기능은 아직 준비 중입니다.")
+        """새로운 퀴즈를 입력받아 등록한다."""
+        print("\n--- 새 퀴즈 등록 ---")
+
+        question = self._read_text("문제를 입력하세요: ")
+        if question is None:
+            return
+
+        choices = []
+        for i in range(1, 5):
+            choice = self._read_text(f"선택지 {i}: ")
+            if choice is None:
+                return
+            choices.append(choice)
+
+        answer = self._read_answer_number()
+        if answer is None:
+            return
+
+        quiz = Quiz(question, choices, answer)
+        self.quizzes.append(quiz)
+        self.save()
+        print("\n퀴즈가 등록되었습니다!")
 
     def list_quizzes(self):
         print("\n[미구현] 퀴즈 목록 기능은 아직 준비 중입니다.")
