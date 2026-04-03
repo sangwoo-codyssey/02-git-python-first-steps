@@ -145,7 +145,17 @@ class QuizGame:
         print("\n퀴즈가 등록되었습니다!")
 
     def list_quizzes(self):
-        print("\n[미구현] 퀴즈 목록 기능은 아직 준비 중입니다.")
+        """저장된 퀴즈 목록을 출력한다."""
+        if not self.quizzes:
+            print("\n등록된 퀴즈가 없습니다.")
+            return
+
+        print(f"\n--- 퀴즈 목록 (총 {len(self.quizzes)}개) ---")
+        for i, quiz in enumerate(self.quizzes, 1):
+            print(f"\n  [{i}] {quiz.question}")
+            for j, choice in enumerate(quiz.choices, 1):
+                marker = "→" if j == quiz.answer else " "
+                print(f"      {marker} {j}. {choice}")
 
     def show_score(self):
         print("\n[미구현] 점수 확인 기능은 아직 준비 중입니다.")
