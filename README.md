@@ -30,7 +30,7 @@ python main.py
 ./run.sh run
 ```
 
-바인드 마운트 경로는 기본값 `~/App`이며, 변경 가능합니다:
+바인드 마운트 경로는 기본값이 현재 디렉터리이며, 변경 가능합니다:
 
 ```bash
 ./run.sh shell /path/to/project     # 인자로 지정
