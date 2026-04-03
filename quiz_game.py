@@ -47,6 +47,7 @@ class QuizGame:
     def __init__(self):
         self.quizzes = []
         self.best_score = None
+        self.best_total = None
         self.history = []
         self.load()
 
@@ -138,6 +139,7 @@ class QuizGame:
 
         if self.best_score is None or correct > self.best_score:
             self.best_score = correct
+            self.best_total = total
             print("  ★ 새로운 최고 점수입니다!")
 
         self.save()
@@ -224,7 +226,10 @@ class QuizGame:
             print("\n아직 퀴즈를 푼 기록이 없습니다.")
             return
 
-        print(f"\n★ 최고 점수: {self.best_score}/{len(self.quizzes)}")
+        if self.best_total is not None:
+            print(f"\n★ 최고 점수: {self.best_score}/{self.best_total}")
+        else:
+            print(f"\n★ 최고 점수: {self.best_score}")
 
         if self.history:
             print(f"\n--- 게임 기록 (최근 10건) ---")
@@ -238,6 +243,7 @@ class QuizGame:
         data = {
             "quizzes": [q.to_dict() for q in self.quizzes],
             "best_score": self.best_score,
+            "best_total": self.best_total,
             "history": self.history,
         }
         try:
@@ -257,6 +263,7 @@ class QuizGame:
                 data = json.load(f)
             self.quizzes = [Quiz.from_dict(q) for q in data.get("quizzes", [])]
             self.best_score = data.get("best_score")
+            self.best_total = data.get("best_total")
             self.history = data.get("history", [])
         except (json.JSONDecodeError, KeyError, TypeError) as e:
             print(f"\n[경고] 데이터 파일이 손상되었습니다: {e}")
@@ -270,6 +277,7 @@ class QuizGame:
         """기본 퀴즈 데이터를 로드한다."""
         self.quizzes = [Quiz.from_dict(q) for q in DEFAULT_QUIZZES]
         self.best_score = None
+        self.best_total = None
         self.history = []
 
     # ── 입력 헬퍼 ──

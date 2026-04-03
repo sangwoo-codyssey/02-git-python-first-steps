@@ -91,6 +91,7 @@ python3 main.py
     }
   ],
   "best_score": 3,
+  "best_total": 5,
   "history": [
     {
       "date": "2026-04-03 15:30:00",
@@ -108,6 +109,7 @@ python3 main.py
 | `quizzes[].choices` | list[str] | 선택지 4개 |
 | `quizzes[].answer` | int | 정답 번호 (1~4) |
 | `best_score` | int \| null | 최고 점수 (미풀이 시 null) |
+| `best_total` | int \| null | 최고 점수 기록 당시 출제 문제 수 |
 | `history` | list | 게임 기록 목록 |
 | `history[].date` | str | 풀이 일시 (YYYY-MM-DD HH:MM:SS) |
 | `history[].total` | int | 출제 문제 수 |
