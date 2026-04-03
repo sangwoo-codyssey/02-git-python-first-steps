@@ -87,7 +87,38 @@ class QuizGame:
     # ── 미구현 기능 (추후 feature 브랜치에서 구현) ──
 
     def play(self):
-        print("\n[미구현] 퀴즈 풀기 기능은 아직 준비 중입니다.")
+        """퀴즈를 출제하고 채점한다."""
+        if not self.quizzes:
+            print("\n등록된 퀴즈가 없습니다. 먼저 퀴즈를 추가해 주세요.")
+            return
+
+        total = len(self.quizzes)
+        correct = 0
+
+        print(f"\n총 {total}문제를 풀겠습니다. 행운을 빕니다!\n")
+
+        for i, quiz in enumerate(self.quizzes, 1):
+            quiz.display(number=i)
+            answer = self._read_answer()
+            if answer is None:
+                print("퀴즈 풀기를 중단합니다.")
+                return
+
+            if quiz.check_answer(answer):
+                print("  ✓ 정답입니다!")
+                correct += 1
+            else:
+                print(f"  ✗ 오답입니다. 정답은 {quiz.answer}번입니다.")
+
+        print(f"\n{'=' * 30}")
+        print(f"  결과: {total}문제 중 {correct}문제 정답")
+        print(f"  점수: {correct}/{total}")
+        print(f"{'=' * 30}")
+
+        if self.best_score is None or correct > self.best_score:
+            self.best_score = correct
+            print("  ★ 새로운 최고 점수입니다!")
+            self.save()
 
     def add_quiz(self):
         print("\n[미구현] 퀴즈 추가 기능은 아직 준비 중입니다.")
