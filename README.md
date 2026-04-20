@@ -259,6 +259,9 @@ main        안정적인 릴리스 버전
 ### Git Clone 실습
 ![Git Clone](screenshots/git_clone.png)
 
+### Git Pull 실습
+![Git Pull](screenshots/git_pull.png)
+
 ## Git 저장소
 
 - https://github.com/sangwoo-codyssey/02-git-python-first-steps
